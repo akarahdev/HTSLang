@@ -1,8 +1,9 @@
 package me.endistic.parser.context;
 
-import me.endistic.compiler.ArgumentSet;
 import me.endistic.parser.tree.Namespace;
+import me.endistic.parser.tree.ast.Expression;
 
+import java.util.List;
 import java.util.function.BiConsumer;
 
 /**
@@ -15,7 +16,7 @@ public sealed interface FunctionBehavior {
      */
     record UserGenerated(Namespace functionName) implements FunctionBehavior {
         @Override
-        public void append(ParseContext ctx, ArgumentSet args) {
+        public void append(ParseContext ctx, List<Expression> args) {
             ctx.builder()
                 .appendSpaced("trigger")
                 .appendRaw(" \"")
@@ -26,17 +27,27 @@ public sealed interface FunctionBehavior {
         }
     }
 
+    record StandardAction(String name) implements FunctionBehavior {
+        @Override
+        public void append(ParseContext ctx, List<Expression> args) {
+            ctx.builder()
+                    .appendSpaced(name);
+            args.forEach(it -> it.buildFiles(ctx));
+            ctx.builder().appendRaw("\n");
+        }
+    }
+
     /**
      * Marks a function as builtin.
      * @param function Code to execute to generate the function.
      */
-    record BuiltIn(BiConsumer<ParseContext, ArgumentSet> function) implements FunctionBehavior {
+    record BuiltIn(BiConsumer<ParseContext, List<Expression>> function) implements FunctionBehavior {
         @Override
-        public void append(ParseContext ctx, ArgumentSet args) {
+        public void append(ParseContext ctx, List<Expression> args) {
             function.accept(ctx, args);
             ctx.builder().appendRaw("\n");
         }
     }
 
-    void append(ParseContext ctx, ArgumentSet args);
+    void append(ParseContext ctx, List<Expression> args);
 }

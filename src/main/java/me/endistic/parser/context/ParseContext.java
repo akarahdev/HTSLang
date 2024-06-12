@@ -1,7 +1,7 @@
 package me.endistic.parser.context;
 
 import me.endistic.compiler.HTSLBuilder;
-import me.endistic.parser.tree.AST;
+import me.endistic.parser.tree.ast.AST;
 import me.endistic.parser.tree.Namespace;
 import me.endistic.parser.tree.Type;
 
@@ -54,21 +54,14 @@ public record ParseContext(
             List.of("message"),
             List.of(new Type.String()),
             new Type.None(),
-            new FunctionBehavior.BuiltIn((ctx, args) -> {
-                ctx.builder().appendSpaced("chat");
-                args.values().forEach(it -> it.buildFiles(ctx));
-            })
-
+            new FunctionBehavior.StandardAction("chat")
         ));
         functions.add(new FunctionData(
             Namespace.of("player:send_action_bar"),
             List.of("message"),
             List.of(new Type.String()),
             new Type.None(),
-            new FunctionBehavior.BuiltIn((ctx, args) -> {
-                ctx.builder().appendSpaced("actionBar");
-                args.values().forEach(it -> it.buildFiles(ctx));
-            })
+            new FunctionBehavior.StandardAction("actionBar")
         ));
         functions.add(new FunctionData(
             Namespace.of("return"),

@@ -3,9 +3,10 @@ package me.endistic;
 import me.endistic.compiler.HTSLBuilder;
 import me.endistic.lexer.Lexer;
 import me.endistic.parser.context.ParseContext;
-import me.endistic.parser.tree.AST;
-import me.endistic.parser.tree.Namespace;
 import me.endistic.parser.tree.Type;
+import me.endistic.parser.tree.ast.AST;
+import me.endistic.parser.tree.Namespace;
+import me.endistic.parser.tree.ast.Header;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,34 +30,43 @@ public class Main {
             new HTSLBuilder()
         );
         var expr = new AST.NamespacedGroup(Namespace.of("mygroup"), List.of(
-            new AST.Header.Function(
-                Namespace.of("mygroup:def"),
-                new Type.None(),
-                List.of()
-            ),
-            new AST.Header.Function(
-                Namespace.of("mygroup:abc"),
+            new Header.Function(
+                Namespace.of("mygroup:test"),
                 new Type.None(),
                 List.of(
-                    new AST.Action.Command(
-                        Namespace.of("player.send_message"),
-                        List.of(
-                            new AST.Expression.StringNode("Hi!")
-                        )
-                    ),
-                    new AST.Action.ModifyStat(
-                        Namespace.of("x"),
-                        new AST.Expression.NumberNode("5"),
-                        "="
-                    ),
-                    new AST.Action.ModifyStat(
-                        Namespace.of("y"),
-                        new AST.Expression.Statistic(Namespace.of("player.max_health")),
-                        "+="
-                    )
+                    
                 )
             )
         ));
+//        var expr = new AST.NamespacedGroup(Namespace.of("mygroup"), List.of(
+//            new AST.Header.Function(
+//                Namespace.of("mygroup:def"),
+//                new Type.None(),
+//                List.of()
+//            ),
+//            new AST.Header.Function(
+//                Namespace.of("mygroup:abc"),
+//                new Type.None(),
+//                List.of(
+//                    new Command(
+//                        Namespace.of("player.send_message"),
+//                        List.of(
+//                            new AST.Expression.StringNode("Hi!")
+//                        )
+//                    ),
+//                    new AST.Action.ModifyStat(
+//                        Namespace.of("x"),
+//                        new AST.Expression.NumberNode("5"),
+//                        "="
+//                    ),
+//                    new AST.Action.ModifyStat(
+//                        Namespace.of("y"),
+//                        new AST.Expression.Statistic(Namespace.of("player.max_health")),
+//                        "+="
+//                    )
+//                )
+//            )
+//        ));
         ctx.withHousingBuiltins();
         expr.generateContext(ctx);
         expr.buildFiles(ctx);
