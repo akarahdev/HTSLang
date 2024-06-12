@@ -20,7 +20,7 @@ public sealed interface FunctionBehavior {
             ctx.builder()
                 .appendSpaced("trigger")
                 .appendRaw(" \"")
-                .appendRaw(functionName.toString())
+                .appendRaw(functionName.toHTSLFormat())
                 .appendRaw("\" ")
                 .appendSpaced("false")
                 .appendRaw("\n");

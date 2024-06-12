@@ -21,6 +21,18 @@ public record Namespace(List<String> name) {
         return new Namespace(rm);
     }
 
+    public int length() {
+        return name().size();
+    }
+
+    public boolean isResult() {
+        return this.name.getLast().endsWith("$result");
+    }
+
+    public boolean isLocal() {
+        return this.name.getLast().endsWith("$local");
+    }
+
 
     public String toString() {
         return String.join(".", name);

@@ -26,7 +26,7 @@ sealed public interface Header extends AST {
 
         @Override
         public void buildFiles(ParseContext context) {
-            context.builder().setCurrentFile(name.toString());
+            context.builder().setCurrentFile(name);
             for (var a : actions) {
                 a.buildFiles(context);
             }

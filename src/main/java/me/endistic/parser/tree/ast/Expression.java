@@ -20,19 +20,7 @@ public sealed interface Expression extends AST {
 
         @Override
         public void buildFiles(ParseContext context) {
-            switch (stat.name().get(0)) {
-                case "globalstat" -> {
-                    context.builder().appendRaw("%stats.global/").appendRaw(stat.toString()).appendRaw("%");
-                }
-                case "playerstat" -> {
-                    context.builder().appendRaw("%stats.player/").appendRaw(stat.toString()).appendRaw("%");
-                }
-                default -> {
-                    context.findPlaceholder(stat).ifPresent(st -> {
-                        context.builder().appendRaw(st).appendRaw(" ");
-                    });
-                }
-            }
+            context.builder().appendStatisticPlaceholder(stat, context);
         }
 
         @Override

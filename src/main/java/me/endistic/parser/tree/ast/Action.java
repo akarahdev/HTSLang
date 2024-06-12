@@ -52,36 +52,10 @@ public sealed interface Action extends AST {
 
         @Override
         public void buildFiles(ParseContext context) {
-            switch (stat.name().get(0)) {
-                case "globalstat", "gs" -> {
-                    context
-                        .builder()
-                        .appendSpaced("globalstat")
-                        .appendSpaced(this.stat().removePrefix().toString())
-                        .appendSpaced(operation);
-                    rhs.buildFiles(context);
-                }
-                case "playerstat", "ps" -> {
-                    context
-                        .builder()
-                        .appendSpaced("playerstat")
-                        .appendRaw(this.stat().removePrefix().toString())
-                        .appendSpaced(" ")
-                        .appendSpaced(operation);
-                    rhs.buildFiles(context);
-                }
-                default -> {
-                    context
-                        .builder()
-                        .appendSpaced("globalstat")
-                        .appendSpaced(this
-                            .stat()
-                            .addPrefix(context.builder().getCurrentFile())
-                            .addPrefix("tmp").toHTSLFormat())
-                        .appendSpaced(operation);
-                    rhs.buildFiles(context);
-                }
-            }
+            context.builder().appendStatisticPlaceholder(stat, context);
+            context.builder().appendRaw(" ");
+            context.builder().appendSpaced(operation);
+            rhs.buildFiles(context);
             context.builder().appendRaw("\n");
         }
 

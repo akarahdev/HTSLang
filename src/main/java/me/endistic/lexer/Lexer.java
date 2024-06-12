@@ -10,14 +10,27 @@ public class Lexer {
     public String internal;
     public int index = -1;
 
+    int column = 1;
+    int row = 1;
+
+    List<Token> toks = new ArrayList<Token>();
+
     public static List<Token> lex(String lex) {
         var lexer = new Lexer();
         lexer.internal = lex;
         return lexer.getTokens();
     }
 
+    public String getInternalLine() {
+        try {
+            return internal.split("\n")[column-1];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return "";
+        }
+
+    }
+
     public List<Token> getTokens() {
-        var toks = new ArrayList<Token>();
         while(true) {
             var incoming = tryEat();
             if(incoming.isOk()) {
@@ -28,6 +41,7 @@ public class Lexer {
     }
 
     String read() {
+        row++;
         return String.valueOf(internal.charAt(++index));
     }
 
@@ -36,8 +50,21 @@ public class Lexer {
     }
 
     void skipWhitespace() {
-        while(Character.isWhitespace(internal.charAt(index+1)))
+        while(Character.isWhitespace(internal.charAt(index+1))) {
+            if(internal.charAt(index+1) == '\n') {
+                column++;
+                row = 1;
+                toks.add(new Token.NewLine(new SpanData(
+                    this.column,
+                    this.row,
+                    this.getInternalLine(),
+                    this.internal
+                )));
+            }
             index++;
+            row++;
+        }
+
     }
 
     char match(char check) {
@@ -57,7 +84,8 @@ public class Lexer {
                 while (keywordString.contains(peek())) {
                     b.append(read());
                 }
-                return new Result.Ok<>(new Token.Keyword(b.toString()));
+                return new Result.Ok<>(new Token.Keyword(b.toString(),
+                    new SpanData(this.column, this.row, getInternalLine(), internal)));
             }
 
             var numberString = "123456789";
@@ -66,7 +94,8 @@ public class Lexer {
                 while (numberString.contains(peek())) {
                     b.append(read());
                 }
-                return new Result.Ok<>(new Token.Number(b.toString()));
+                return new Result.Ok<>(new Token.Number(b.toString(),
+                    new SpanData(this.column, this.row, getInternalLine(), internal)));
             }
 
 
@@ -75,21 +104,48 @@ public class Lexer {
                     var sb = new StringBuilder();
                     while (!peek().equals("\""))
                         sb.append(read());
-                    yield new Result.Ok<>(new Token.StringValue(sb.toString()));
+                    match('"');
+                    yield new Result.Ok<>(new Token.StringValue(sb.toString(),
+                        new SpanData(this.column, this.row, getInternalLine(), internal)));
                 }
 
-                case "(" -> new Result.Ok<>(new Token.OpenParen());
-                case ")" -> new Result.Ok<>(new Token.CloseParen());
-                case "[" -> new Result.Ok<>(new Token.OpenBracket());
-                case "]" -> new Result.Ok<>(new Token.CloseBracket());
-                case "{" -> new Result.Ok<>(new Token.OpenBrace());
-                case "}" -> new Result.Ok<>(new Token.CloseBrace());
+                case "(" -> new Result.Ok<>(new Token.OpenParen(
+                    new SpanData(this.column, this.row, getInternalLine(), internal)
+                ));
+                case ")" -> new Result.Ok<>(new Token.CloseParen(
+                    new SpanData(this.column, this.row, getInternalLine(), internal)
+                ));
+                case "[" -> new Result.Ok<>(new Token.OpenBracket(
+                    new SpanData(this.column, this.row, getInternalLine(), internal)
+                ));
+                case "]" -> new Result.Ok<>(new Token.CloseBracket(
+                    new SpanData(this.column, this.row, getInternalLine(), internal)
+                ));
+                case "{" -> new Result.Ok<>(new Token.OpenBrace(
+                    new SpanData(this.column, this.row, getInternalLine(), internal)
+                ));
+                case "}" -> new Result.Ok<>(new Token.CloseBrace(
+                    new SpanData(this.column, this.row, getInternalLine(), internal)
+                ));
 
-                case "+" -> new Result.Ok<>(new Token.Plus());
-                case "-" -> new Result.Ok<>(new Token.Minus());
-                case "*" -> new Result.Ok<>(new Token.Star());
-                case "/" -> new Result.Ok<>(new Token.Slash());
-                case "=" -> new Result.Ok<>(new Token.Equals());
+                case "+" -> new Result.Ok<>(new Token.Plus(
+                    new SpanData(this.column, this.row, getInternalLine(), internal)
+                ));
+                case "-" -> new Result.Ok<>(new Token.Minus(
+                    new SpanData(this.column, this.row, getInternalLine(), internal)
+                ));
+                case "*" -> new Result.Ok<>(new Token.Star(
+                    new SpanData(this.column, this.row, getInternalLine(), internal)
+                ));
+                case "/" -> new Result.Ok<>(new Token.Slash(
+                    new SpanData(this.column, this.row, getInternalLine(), internal)
+                ));
+                case "=" -> new Result.Ok<>(new Token.Equals(
+                    new SpanData(this.column, this.row, getInternalLine(), internal)
+                ));
+                case ":" -> new Result.Ok<>(new Token.Colon(
+                    new SpanData(this.column, this.row, getInternalLine(), internal)
+                ));
 
                 default -> new Result.Err<>(new RuntimeException("invalid char"));
             };

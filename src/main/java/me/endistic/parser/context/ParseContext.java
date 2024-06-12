@@ -71,9 +71,9 @@ public record ParseContext(
             new FunctionBehavior.BuiltIn((ctx, args) -> {
                 ctx.builder()
                     .appendSpaced("globalstat")
-                    .appendSpaced(ctx.builder().getCurrentFile() + "__result")
+                    .appendSpaced(ctx.builder().getCurrentFile().toHTSLFormat() + "$result")
                     .appendSpaced("=");
-                args.get(0).buildFiles(ctx);
+                args.getFirst().buildFiles(ctx);
                 ctx.builder.appendRaw("\n");
                 ctx.builder.appendSpaced("exit");
             })
